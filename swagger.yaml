@@ -181,6 +181,31 @@ paths:
       security:
       - simchain_auth:
         - read:simchain
+  /key/address/{address}:
+    get:
+      tags:
+      - key
+      summary: get user's key with address from keyLists
+      description: Returns key of login user and the address
+      operationId: getKeyOfAddress
+      produces:
+      - application/json
+      parameters:
+      - name: address
+        in: path
+        description: address values of wallet to return
+        required: true
+        type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            $ref: '#/definitions/keyLists'
+        401:
+          description: 'UnauthorizedError: private profile'
+      security:
+      - simchain_auth:
+        - read:simchain
   /tx/requests:
     get:
       tags:

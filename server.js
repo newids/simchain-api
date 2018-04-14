@@ -40,7 +40,11 @@ app.use(passport.initialize());
 app.use('/user', routesApi);
 
 // --------------
+var keyRoutes = require('./api/routes/keyRoutes');
 
+app.use('/key', keyRoutes);
+
+// --------------
 var routes = require('./api/routes/simChainRoutes'); //importing route
 
 routes(app); //register the route

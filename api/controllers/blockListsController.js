@@ -21,12 +21,13 @@ exports.createGenesisBlock = function(req, res) {
       if (err)
         res.send(err);
       res.json(block);
-    });
+    }); // error // DEBUG: error
   }
 }
 
 
 exports.list_blocks = function(req, res) {
+
   // blockLists.find({}, function(err, block) {
   //   if (err)
   //     res.send(err);

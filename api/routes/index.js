@@ -12,7 +12,6 @@ var ctrlAuth = require('../controllers/authentication');
 // profile
 router.get('/profile', auth, ctrlProfile.profileRead);
 router.get('/profile/:id', ctrlProfile.profile_of_node);
-router.get('/profile_node/:id', ctrlProfile.profile_of_node);
 router.get('/profile_all', ctrlProfile.profile_all);
 router.get('/status', auth, ctrlProfile.profile_status);
 
