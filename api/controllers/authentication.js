@@ -31,7 +31,7 @@ module.exports.register = function (req, res) {
             "success": true,
             "message": null,
             "errors": null,
-            "token": token
+            "token": token,
             "node_number": user.node_number,
             "email": user.email
         });
