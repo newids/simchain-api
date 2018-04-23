@@ -1,610 +1,587 @@
-swagger: '2.0'
+openapi: 3.0.0
+servers:
+  - url: 'https://virtserver.swaggerhub.com/simchain/simchainAPI/1.0.0'
+  - url: 'http://virtserver.swaggerhub.com/simchain/simchainAPI/1.0.0'
 info:
   description: |
     This is a simple blockchain simulating server.
     You can find out more about SimChain at
     [http://simchain.kr](http://simchain.kr).
-  version: 1.0.0
+  version: "1.0.0-oas3"
   title: SimChain Blockchain Simulator
-  termsOfService: http://simchain.kr/terms/
+  termsOfService: 'http://simchain.kr/terms/'
   contact:
     email: simchain@iris.builders
   license:
     name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-#  host: simchain.kr
-#  basePath: /
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 tags:
-- name: block
-  description: Access to Key Lists
-- name: key
-  description: Access to Key Lists
-- name: txLists
-  description: Access to Tx Lists
-- name: user
-  description: Operations about user
-###  externalDocs:
-###    description: Find out more about our simulator
-###    url: http://simchain.kr
-# schemes:
-# - http
+  - name: block
+    description: Access to Key Lists
+  - name: key
+    description: Access to Key Lists
+  - name: txLists
+    description: Access to Tx Lists
+  - name: user
+    description: Operations about user
 paths:
   /block:
     get:
       tags:
-      - block
+        - block
       summary: get latest some block list from blockLists
       description: Returns a map of status codes to quantities
       operationId: getBlockLists
-      produces:
-      - application/json
-      parameters: []
       responses:
-        200:
+        '200':
           description: successful operation
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/blockLists'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/blockLists'
       security:
-      - simchain_auth:
-        - read:simchain
+        - simchain_auth:
+            - 'read:simchain'
     post:
       tags:
-      - block
+        - block
       summary: Add a new block to the blockLists
       operationId: addBlock
-      consumes:
-      - application/x-www-form-urlencoded
-      produces:
-      - application/json
-      parameters:
-      - in: body
-        name: body
-        description: data for new block
-        required: true
-        schema:
-          $ref: '#/definitions/blockLists'
       responses:
-        200:
+        '200':
           description: successful operation
-          schema:
-            $ref: '#/definitions/blockLists'
-        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/blockLists'
+        '400':
           description: Invalid input
-        405:
+        '405':
           description: Invalid input
       security:
-      - simchain_auth:
-        - write:simchain
-        - read:simchain
-  /block/height/{height}:
+        - simchain_auth:
+            - 'write:simchain'
+            - 'read:simchain'
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/blockLists'
+        description: data for new block
+        required: true
+  '/block/height/{height}':
     get:
       tags:
-      - block
+        - block
       summary: get block by Height
       description: return block by Height
       operationId: getBlockByHeight
-      produces:
-      - application/json
       parameters:
-      - name: height
-        in: path
-        description: height values of block to return
-        required: true
-        type: integer
-        format: int64
-      responses:
-        200:
-          description: successful operation
+        - name: height
+          in: path
+          description: height values of block to return
+          required: true
           schema:
-            $ref: '#/definitions/blockLists'
-        400:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/blockLists'
+        '400':
           description: Invalid height value
-        404:
+        '404':
           description: block not found
       security:
-      - simchain_auth:
-        - read:simchain
+        - simchain_auth:
+            - 'read:simchain'
   /block/latest:
     get:
       tags:
-      - block
+        - block
       summary: get latest block
       description: return latest block
       operationId: getLatestBlock
-      produces:
-      - application/json
-      parameters: []
       responses:
-        200:
+        '200':
           description: successful operation
-          schema:
-            $ref: '#/definitions/blockLists'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/blockLists'
       security:
-      - simchain_auth:
-        - read:simchain
+        - simchain_auth:
+            - 'read:simchain'
   /key:
     post:
       tags:
-      - key
+        - key
       summary: Add a new key to the keyLists
       operationId: addKey
-      consumes:
-      - application/x-www-form-urlencoded
-      produces:
-      - application/json
-      parameters:
-      - in: body
-        name: body
-        description: data for new block
-        required: true
-        schema:
-          $ref: '#/definitions/keyLists'
       responses:
-        200:
+        '200':
           description: successful operation
-          schema:
-            $ref: '#/definitions/keyLists'
-        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/keyLists'
+        '400':
           description: Invalid input
-        405:
+        '405':
           description: Invalid input
       security:
-      - simchain_auth:
-        - write:simchain
-        - read:simchain
-  /key/node/{node_number}:
+        - simchain_auth:
+            - 'write:simchain'
+            - 'read:simchain'
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/keyLists'
+        description: data for new block
+        required: true
+  '/key/node/{node_number}':
     get:
       tags:
-      - key
+        - key
       summary: get user's latest key list from keyLists
       description: Returns key list of a user
       operationId: getKeyLists
-      produces:
-      - application/json
       parameters:
-      - name: node_number
-        in: path
-        description: node_number values of user to return
-        required: true
-        type: string
-      responses:
-        200:
-          description: successful operation
+        - name: node_number
+          in: path
+          description: node_number values of user to return
+          required: true
           schema:
-            $ref: '#/definitions/keyLists'
-        400:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/keyLists'
+        '400':
           description: Invalid node_number value
-        404:
+        '404':
           description: node_number not found
       security:
-      - simchain_auth:
-        - read:simchain
-  /key/address/{address}:
+        - simchain_auth:
+            - 'read:simchain'
+  '/key/address/{address}':
     get:
       tags:
-      - key
+        - key
       summary: get user's key with address from keyLists
       description: Returns key of login user and the address
       operationId: getKeyOfAddress
-      produces:
-      - application/json
       parameters:
-      - name: address
-        in: path
-        description: address values of wallet to return
-        required: true
-        type: string
-      responses:
-        200:
-          description: successful operation
+        - name: address
+          in: path
+          description: address values of wallet to return
+          required: true
           schema:
-            $ref: '#/definitions/keyLists'
-        401:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/keyLists'
+        '401':
           description: 'UnauthorizedError: private profile'
       security:
-      - simchain_auth:
-        - read:simchain
+        - simchain_auth:
+            - 'read:simchain'
   /tx/requests:
     get:
       tags:
-      - txLists
+        - txLists
       summary: get tx requests from txLists
-      description: Returns tx request list for mining, txLists which is height is 0
+      description: 'Returns tx request list for mining, txLists which is height is 0'
       operationId: getLists
-      produces:
-      - application/json
-      parameters: []
       responses:
-        200:
+        '200':
           description: successful operation
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/txLists'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/txLists'
       security:
-      - simchain_auth:
-        - read:simchain
+        - simchain_auth:
+            - 'read:simchain'
     post:
       tags:
-      - txLists
+        - txLists
       summary: Add a new tx to the txLists
       description: new tx with height = 0
       operationId: addTxLists
-      consumes:
-      - application/x-www-form-urlencoded
-      produces:
-      - application/json
-      parameters:
-      - in: body
-        name: body
-        description: data for new block
-        required: true
-        schema:
-          $ref: '#/definitions/txLists'
       responses:
-        200:
+        '200':
           description: successful operation
-          schema:
-            $ref: '#/definitions/keyLists'
-        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/keyLists'
+        '400':
           description: Invalid input
-        405:
+        '405':
           description: Invalid input
       security:
-      - simchain_auth:
-        - write:simchain
-        - read:simchain
-  /tx/height/{height}:
+        - simchain_auth:
+            - 'write:simchain'
+            - 'read:simchain'
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/txLists'
+        description: data for new block
+        required: true
+  '/tx/height/{height}':
     get:
       tags:
-      - txLists
+        - txLists
       summary: get tx list of height from txLists
       description: Returns tx list of height
       operationId: getTxLists
-      produces:
-      - application/json
       parameters:
-      - name: height
-        in: path
-        description: height values of tx to return
-        required: true
-        type: number
-      responses:
-        200:
-          description: successful operation
+        - name: height
+          in: path
+          description: height values of tx to return
+          required: true
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/txLists'
+            type: number
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/txLists'
       security:
-      - simchain_auth:
-        - read:simchain
-  /tx/node/{node_number}:
+        - simchain_auth:
+            - 'read:simchain'
+  '/tx/node/{node_number}':
     get:
       tags:
-      - txLists
+        - txLists
       summary: get tx list of node_number from txLists
       description: Returns tx list of node_number
       operationId: getNodeTxLists
-      produces:
-      - application/json
       parameters:
-      - name: node_number
-        in: path
-        description: node_number values of tx to return
-        required: true
-        type: number
-      responses:
-        200:
-          description: successful operation
+        - name: node_number
+          in: path
+          description: node_number values of tx to return
+          required: true
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/txLists'
+            type: number
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/txLists'
       security:
-      - simchain_auth:
-        - read:simchain
-  /user:
+        - simchain_auth:
+            - 'read:simchain'
+  /user/login:
     post:
       tags:
-      - user
-      summary: Create user
-      description: This can only be done by the logged in user.
-      operationId: createUser
-      produces:
-      - application/json
-      parameters:
-      - in: body
-        name: body
-        description: Created user object
-        required: true
-        schema:
-          $ref: '#/definitions/User'
-      responses:
-        default:
-          description: successful operation
-  /user/login:
-    get:
-      tags:
-      - user
+        - user
       summary: Logs user into the system
       operationId: loginUser
-      produces:
-      - application/json
-      parameters:
-      - name: email
-        in: query
-        description: The user name for login
-        required: true
-        type: string
-      - name: password
-        in: query
-        description: The password for login in clear text
-        required: true
-        type: string
+      requestBody:
+        description: email / password
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email address
+                  required: true
+                password:
+                  description: The password for login in clear text
+                  type: string
+                  required: true
+          examples: []
+        
       responses:
-        200:
+        '200':
           description: successful operation
-          schema:
-            $ref: '#/definitions/Token'
-        400:
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Token'
+        '400':
           description: Invalid username/password supplied
   /user/logout:
     get:
       tags:
-      - user
+        - user
       summary: Logs out current logged in user session
       operationId: logoutUser
-      produces:
-      - application/json
-      parameters: []
       responses:
         default:
           description: successful operation
   /user/profile:
     get:
       tags:
-      - user
+        - user
       summary: Get user's profile
       operationId: getUserProfile
-      produces:
-      - application/json
       parameters:
-      - name: Authorization
-        in: header
-        description: JSON Web Token(Bearer)
-        required: true
-        type: string
-      responses:
-        200:
-          description: successful operation
+        - name: Authorization
+          in: header
+          description: JSON Web Token(Bearer)
+          required: true
           schema:
-            $ref: '#/definitions/User'
-        400:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
           description: 'UnauthorizedError: private profile'
-  /user/profile/{node_number}:
+  '/user/profile/{node_number}':
     get:
       tags:
-      - user
+        - user
       summary: Get user profile
       operationId: getUserByNodeNumber
-      produces:
-      - application/json
       parameters:
-      - name: node_number
-        in: path
-        description: The node_number that needs to be fetched.(없으면 로그인한 유저 정보)
-        required: true
-        type: string
-      responses:
-        200:
-          description: successful operation
+        - name: node_number
+          in: path
+          description: The node_number that needs to be fetched.(없으면 로그인한 유저 정보)
+          required: true
           schema:
-            $ref: '#/definitions/User'
-        400:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
           description: Invalid node_number supplied
-        404:
+        '404':
           description: User not found
     put:
       tags:
-      - user
+        - user
       summary: Updated user
       description: This can only be done by the logged in user.
       operationId: updateUser
-      produces:
-      - application/json
       parameters:
-      - name: node_number
-        in: path
-        description: name that need to be updated
-        required: true
-        type: string
-      - in: body
-        name: body
+        - name: node_number
+          in: path
+          description: name that need to be updated
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid user supplied
+        '404':
+          description: User not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
         description: Updated user object
         required: true
-        schema:
-          $ref: '#/definitions/User'
-      responses:
-        400:
-          description: Invalid user supplied
-        404:
-          description: User not found
     delete:
       tags:
-      - user
+        - user
       summary: Delete user
       description: This can only be done by the logged in user.
       operationId: deleteUser
-      produces:
-      - application/json
       parameters:
-      - name: node_number
-        in: path
-        description: The name that needs to be deleted
-        required: true
-        type: string
+        - name: node_number
+          in: path
+          description: The name that needs to be deleted
+          required: true
+          schema:
+            type: string
       responses:
-        400:
+        '400':
           description: Invalid node_number supplied
-        404:
+        '404':
           description: User not found
   /user/status:
     get:
       tags:
-      - user
+        - user
       summary: Get user's status
       operationId: getUserStatus
-      produces:
-      - application/json
       parameters:
-      - name: Authorization
-        in: header
-        description: JSON Web Token(Bearer)
-        required: true
-        type: string
-      responses:
-        200:
-          description: successful operation
+        - name: Authorization
+          in: header
+          description: JSON Web Token(Bearer)
+          required: true
           schema:
-            $ref: '#/definitions/Status'
-        401:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        '401':
           description: 'UnauthorizedError: private profile'
-securityDefinitions:
-  simchain_auth:
-    type: oauth2
-    authorizationUrl: http://auth.simchain.kr/oauth/dialog
-    flow: implicit
-    scopes:
-      write:simchain: modify your data of simchain
-      read:simchain: read your data of simchain
-  api_key:
-    type: apiKey
-    name: api_key
-    in: header
-definitions:
-  blockLists:
-    type: object
-    required:
-    - height
-    - prev_hash
-    - merkle_root
-    - nbits
-    - nonce
-    properties:
-      height:
-        type: number
-      prev_hash:
-        type: string
-      merkle_root:
-        type: string
-      time:
-        type: string
-      nbits:
-        type: string
-      nonce:
-        type: string
-      created_date:
-        type: string
-        default: Date.now
-    xml:
-      name: block
-  keyLists:
-    type: object
-    required:
-    - private_key
-    - public_key
-    - wif
-    - wif_compressed
-    - address
-    - node_number
-    properties:
-      private_key:
-        type: string
-      public_key:
-        type: string
-      wif:
-        type: string
-      wif_compressed:
-        type: string
-      address:
-        type: string
-      node_number:
-        type: number
-      amount:
-        type: number
-  txLists:
-    type: object
-    required:
-    - height
-    - from
-    - from_node
-    - to
-    - to_node
-    - amount
-    properties:
-      height:
-        type: number
-      hash_pointer:
-        type: string
-      from:
-        type: string
-      from_node:
-        type: string
-      to:
-        type: string
-      to_node:
-        type: string
-      amount:
-        type: number
-      created_date:
-        type: string
-        format: date-time
-  User:
-    type: object
-    required:
-    - email
-    - node_number
-    properties:
-      email:
-        type: string
-      node_number:
-        type: string
-      hash:
-        type: string
-      salf:
-        type: string
-      balance:
-        type: integer
-        format: int64
-  Token:
-    type: object
-    properties:
-      token:
-        type: string
-        description: json web token
-      node_number:
-        type: string
-      nbits:
-        type: string
-      status:
-        type: string
-  Status:
-    type: object
-    properties:
-      node_number:
-        type: string
-      nbits:
-        type: string
-      status:
-        type: string
 externalDocs:
   description: Find out more about SimChain
-  url: http://simchain.kr
-# Added by API Auto Mocking Plugin
-host: simchain.kr:3000
-basePath: /simchain/simchainAPI/1.0.0
-schemes:
- - http
+  url: 'http://simchain.kr'
+components:
+  schemas:
+    blockLists:
+      type: object
+      required:
+        - height
+        - prev_hash
+        - merkle_root
+        - nbits
+        - nonce
+      properties:
+        height:
+          type: number
+        node_number:
+          type: string
+        address:
+          type: string
+        prev_hash:
+          type: string
+        merkle_root:
+          type: string
+        time:
+          type: string
+        nbits:
+          type: string
+        nonce:
+          type: string
+        created_date:
+          type: string
+          default: Date.now
+    keyLists:
+      type: object
+      required:
+        - private_key
+        - public_key
+        - wif
+        - wif_compressed
+        - address
+        - node_number
+      properties:
+        private_key:
+          type: string
+        public_key:
+          type: string
+        wif:
+          type: string
+        wif_compressed:
+          type: string
+        address:
+          type: string
+        node_number:
+          type: number
+        amount:
+          type: number
+    txLists:
+      type: object
+      required:
+        - height
+        - from
+        - from_node
+        - to
+        - to_node
+        - amount
+      properties:
+        height:
+          type: number
+        hash_pointer:
+          type: string
+        from:
+          type: string
+        from_node:
+          type: string
+        to:
+          type: string
+        to_node:
+          type: string
+        amount:
+          type: number
+        created_date:
+          type: string
+          format: date-time
+    User:
+      type: object
+      required:
+        - email
+        - node_number
+      properties:
+        email:
+          type: string
+        node_number:
+          type: string
+        hash:
+          type: string
+        salf:
+          type: string
+        balance:
+          type: integer
+          format: int64
+    Token:
+      type: object
+      properties:
+        token:
+          type: string
+          description: json web token
+        node_number:
+          type: string
+        nbits:
+          type: string
+        status:
+          type: string
+    Status:
+      type: object
+      properties:
+        node_number:
+          type: string
+        nbits:
+          type: string
+        status:
+          type: string
+  securitySchemes:
+    simchain_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'http://auth.simchain.kr/oauth/dialog'
+          scopes:
+            'write:simchain': modify your data of simchain
+            'read:simchain': read your data of simchain
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
