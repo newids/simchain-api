@@ -4,6 +4,9 @@ var mongoose = require('mongoose'),
   blockLists = mongoose.model('blockLists'),
   txLists = mongoose.model('txLists');
 
+var response = require('./response');
+
+
 exports.createGenesisBlock = function(req, res) {
   blockLists.find({
     height: 0
@@ -18,10 +21,13 @@ exports.createGenesisBlock = function(req, res) {
     var new_block = new blockLists(req.body);
 
     new_block.save(function(err, block) {
-      if (err)
-        res.send(err);
-      res.json(block);
-    }); // error // DEBUG: error
+        if (err) {
+            response.resFalse(res, 'Error:', err.toLocaleString());
+        }
+        else {
+            response.resTrue(res, block);
+        }
+    });
   }
 }
 
@@ -39,9 +45,12 @@ exports.list_blocks = function(req, res) {
   }).limit(20);
 
   q.exec(function(err, block) {
-    if (err)
-      res.send(err);
-    res.json(block);
+      if (err) {
+          response.resFalse(res, 'Error:', err.toLocaleString());
+      }
+      else {
+          response.resTrue(res, tx);
+      }
   });
 
 };
@@ -49,8 +58,10 @@ exports.list_blocks = function(req, res) {
 exports.create_a_block = function(req, res) {
   var new_block = new blockLists(req.body);
   new_block.save(function(err, block) {
-    if (err)
-      res.send(err);
+      if (err) {
+          response.resFalse(res, 'Error:', err.toLocaleString());
+          return;
+      }
 
     // txLists.find({
     //   'height': 0

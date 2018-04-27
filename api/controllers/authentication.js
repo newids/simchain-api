@@ -9,16 +9,18 @@ var sendJSONresponse = function (res, status, content) {
 
 module.exports.register = function (req, res) {
 
-    // if(!req.body.name || !req.body.email || !req.body.password) {
-    //   sendJSONresponse(res, 400, {
-    //     "message": "All fields required"
-    //   });
-    //   return;
-    // }
+    if (!req.body.email || !req.body.password) {
+        sendJSONresponse(res, 400, {
+            "success": false,
+            "message": "All fields required",
+            "errors": "All fields required"
+        });
+        return;
+    }
 
     var user = new User();
 
-    user.node_number = (Math.floor(Math.random() * 999) + 1) * 10 + Math.floor(Math.random() * 10);
+    user.node_number = ((Math.floor(Math.random() * 999) + 1) * 10 + Math.floor(Math.random() * 10)).toString();
     user.email = req.body.email;
 
     user.setPassword(req.body.password);
@@ -41,12 +43,15 @@ module.exports.register = function (req, res) {
 
 module.exports.login = function (req, res) {
 
-    // if(!req.body.email || !req.body.password) {
-    //   sendJSONresponse(res, 400, {
-    //     "message": "All fields required"
-    //   });
-    //   return;
-    // }
+    if (!req.body.email || !req.body.password) {
+        sendJSONresponse(res, 400, {
+            "success": false,
+            "message": "All fields required",
+            "errors": "All fields required"
+        });
+        return;
+    }
+
 
     passport.authenticate('local', function (err, user, info) {
         var token;
@@ -76,7 +81,7 @@ module.exports.login = function (req, res) {
             // ------------------------------------------------
             var user = new User();
 
-            user.node_number = (Math.floor(Math.random() * 999) + 1) * 10 + Math.floor(Math.random() * 10);
+            user.node_number = ((Math.floor(Math.random() * 999) + 1) * 10 + Math.floor(Math.random() * 10)).toString();
             user.email = req.body.email;
 
             user.setPassword(req.body.password);

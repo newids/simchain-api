@@ -14,6 +14,8 @@ router.get('/profile', auth, ctrlProfile.profileRead);
 router.get('/profile/:id', ctrlProfile.profile_of_node);
 router.get('/profile_all', ctrlProfile.profile_all);
 router.get('/status', auth, ctrlProfile.profile_status);
+router.get('/refresh', auth, ctrlProfile.refresh);
+router.get('/me', auth, ctrlProfile.me);
 
 // authentication
 router.post('/register', ctrlAuth.register);

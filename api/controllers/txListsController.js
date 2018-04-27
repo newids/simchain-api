@@ -1,93 +1,118 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-  txLists = mongoose.model('txLists'),
-  User = mongoose.model('User');
+    txLists = mongoose.model('txLists'),
+    User = mongoose.model('User');
+var response = require('./response');
 
-exports.read_a_tx_with_height = function(req, res) {
-  txLists.find({
-    'height': req.params.id
-  }, function(err, tx) {
-    if (err)
-      res.send(err);
-    res.json(tx);
-  });
-};
-
-exports.read_a_tx_with_node = function(req, res) {
-  txLists.find({
-    'node_number': req.params.id
-  }, function(err, tx) {
-    if (err)
-      res.send(err);
-    res.json(tx);
-  });
-};
-
-exports.list_all_tx_requests = function(req, res) {
-  txLists.find({
-    'height': 0
-  }, function(err, tx) {
-    if (err)
-      res.send(err);
-    res.json(tx);
-  });
-};
-
-exports.create_a_tx_requests = function(req, res) {
-  var new_tx = new txLists(req.body);
-  new_tx.height = 0;
-  new_tx.save(function(err, tx) {
-    if (err)
-      res.send(err);
-
-    User.findOneAndUpdate({
-      node_number: req.body.to_node
-    }, {
-      $set: {
-        balance: balance + req.body.amount
-      }
-    }, function(err, tx) {
-      if (err)
-        res.send(err)
-
-      User.findOneAndUpdate({
-        node_number: req.body.from_node
-      }, {
-        $set: {
-          balance: balance - req.body.amount
+exports.read_a_tx_with_height = function (req, res) {
+    txLists.find({
+        'height': req.params.id
+    }, function (err, tx) {
+        if (err) {
+            response.resFalse(res, 'Error:', err.toLocaleString());
         }
-      }, function(err, tx) {
-        if (err)
-          res.send(err)
+        else {
+            response.resTrue(res, tx);
+        }
+    });
+};
 
-        Key.findOneAndUpdate({
-          address: req.body.from
+exports.read_a_tx_with_node = function (req, res) {
+    txLists.find({
+        'node_number': req.params.id
+    }, function (err, tx) {
+        if (err) {
+            response.resFalse(res, 'Error:', err.toLocaleString());
+        }
+        else {
+            response.resTrue(res, tx);
+        }
+    });
+};
+
+exports.list_all_tx_requests = function (req, res) {
+    txLists.find({
+        'height': 0
+    }, function (err, tx) {
+        if (err) {
+            response.resFalse(res, 'Error:', err.toLocaleString());
+        }
+        else {
+            response.resTrue(res, tx);
+        }
+    });
+};
+
+exports.create_a_tx_requests = function (req, res) {
+    var new_tx = new txLists(req.body);
+    new_tx.height = 0;
+    new_tx.save(function (err, tx) {
+        if (err) {
+            response.resFalse(res, 'Error:', err.toLocaleString());
+            return;
+        }
+
+        User.findOneAndUpdate({
+            node_number: req.body.to_node
         }, {
-          $set: {
-            balance: balance - req.body.amount
-          }
-        }, function(err, tx) {
-          if (err)
-            res.send(err)
-
-          Key.findOneAndUpdate({
-            address: req.body.to
-          }, {
             $set: {
-              balance: balance + req.body.amount
+                balance: balance + req.body.amount
             }
-          }, function(err, tx) {
-            if (err)
-              res.send(err)
-          });
+        }, function (err, tx) {
+            if (err) {
+                response.resFalse(res, 'Error:', err.toLocaleString());
+                return;
+            }
+
+            User.findOneAndUpdate({
+                node_number: req.body.from_node
+            }, {
+                $set: {
+                    balance: balance - req.body.amount
+                }
+            }, function (err, tx) {
+                if (err) {
+                    response.resFalse(res, 'Error:', err.toLocaleString());
+                    return;
+                }
+
+                Key.findOneAndUpdate({
+                    address: req.body.from
+                }, {
+                    $set: {
+                        balance: balance - req.body.amount
+                    }
+                }, function (err, tx) {
+                    if (err) {
+                        response.resFalse(res, 'Error:', err.toLocaleString());
+                        return;
+                    }
+
+                    Key.findOneAndUpdate({
+                        address: req.body.to
+                    }, {
+                        $set: {
+                            balance: balance + req.body.amount
+                        }
+                    }, function (err, tx) {
+                        if (err) {
+                            response.resFalse(res, 'Error:', err.toLocaleString());
+                            return;
+                        }
+                    });
+                });
+
+            });
         });
 
-      });
+        if (err) {
+            response.resFalse(res, 'Error:', err.toLocaleString());
+        }
+        else {
+            response.resTrue(res, tx);
+        }
     });
-
-    res.json(tx);
-  });
 };
 
 // exports.create_a_tx = function(req, res) {
