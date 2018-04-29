@@ -13,6 +13,9 @@ module.exports = function (app) {
     app.route('/block/latest')
         .get(blockLists.read_a_latest_block);
 
+    app.route('/block/genesis')
+        .post(blockLists.createGenesisBlock);
+
     // txLists ----------------------
     var txLists = require('../controllers/txListsController');
 

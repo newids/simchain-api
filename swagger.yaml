@@ -489,7 +489,6 @@ components:
         - private_key
         - public_key
         - wif
-        - wif_compressed
         - address
         - node_number
       properties:
@@ -498,8 +497,6 @@ components:
         public_key:
           type: string
         wif:
-          type: string
-        wif_compressed:
           type: string
         address:
           type: string

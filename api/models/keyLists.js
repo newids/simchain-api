@@ -16,10 +16,6 @@ var keyListSchema = new Schema({
     type: String,
     required: "wif"
   },
-  wif_compressed: {
-    type: String,
-    required: "wif_compressed"
-  },
   address: {
     type: String,
     required: "address"
