@@ -2,6 +2,7 @@
 
 var mongoose = require('mongoose'),
     txLists = mongoose.model('txLists'),
+    keyLists = mongoose.model('keyLists'),
     User = mongoose.model('User');
 var response = require('./response');
 
@@ -31,6 +32,89 @@ exports.read_a_tx_with_node = function (req, res) {
     });
 };
 
+exports.read_txs_from = function (req, res) {
+    txLists.aggregate([{
+        $match: {'from': req.params.id},
+    }, {
+        $group: {
+            _id: null,
+            total: {$sum: "$amount"}
+        }
+    }], function (err, tx) {
+        if (err) {
+            response.resFalse(res, 'Error:', err.toLocaleString());
+        }
+        else {
+            response.resTrue(res, tx);
+        }
+    });
+};
+
+exports.get_address_balance = function (req, res) {
+    txLists.aggregate([{
+            $match: {'to': req.params.id},
+        }, {
+            $group: {
+                _id: null,
+                total: {$sum: "$amount"}
+            }
+        }],
+        function (err, tx) {
+            if (err) {
+                console.log('Error : ', err.toLocaleString());
+                response.resFalse(res, 'Error:', err.toLocaleString());
+            }
+            else {
+                console.log('tx : ', tx);
+                if (tx === null || tx === undefined || tx === [] || tx.length === 0 ||  tx.total === 0) {
+                    console.log('tx.total === 0 : ', tx);
+                    response.resTrue(res, [{"total": 0}]);
+                }
+                else {
+                    txLists.aggregate([{
+                        $match: {'from': req.params.id},
+                    }, {
+                        $group: {
+                            _id: null,
+                            total: {$sum: "$amount"}
+                        }
+                    }], function (err, tx2) {
+                        if (err) {
+                            console.log('Error : ', err.toLocaleString());
+                            response.resFalse(res, 'Error:', err.toLocaleString());
+                        }
+                        else {
+                            if (tx2 === null || tx2 === undefined || tx2 === [] || tx2.length === 0 ||  tx2.total === 0) {
+                                console.log('tx2.total === 0 : ', tx);
+                                response.resTrue(res, tx);
+                            }
+                            else {
+                                const grandtotal = tx.total - tx2.total;
+                                console.log('tx : ', tx);
+                                console.log('tx2 : ', tx2);
+                                console.log('grand total : ', grandtotal);
+                                response.resTrue(res, [{"total": grandtotal}]);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+};
+
+// exports.read_txs_with_from = function (req, res) {
+//     txLists.find({
+//         'to': req.params.id
+//     }, function (err, tx) {
+//         if (err) {
+//             response.resFalse(res, 'Error:', err.toLocaleString());
+//         }
+//         else {
+//             response.resTrue(res, tx);
+//         }
+//     });
+// };
+
 exports.list_all_tx_requests = function (req, res) {
     txLists.find({
         'height': 0
@@ -45,69 +129,14 @@ exports.list_all_tx_requests = function (req, res) {
 };
 
 exports.create_a_tx_requests = function (req, res) {
+
     var new_tx = new txLists(req.body);
     new_tx.height = 0;
+
     new_tx.save(function (err, tx) {
         if (err) {
             response.resFalse(res, 'Error:', err.toLocaleString());
             return;
-        }
-
-        User.findOneAndUpdate({
-            node_number: req.body.to_node
-        }, {
-            $set: {
-                balance: balance + req.body.amount
-            }
-        }, function (err, tx) {
-            if (err) {
-                response.resFalse(res, 'Error:', err.toLocaleString());
-                return;
-            }
-
-            User.findOneAndUpdate({
-                node_number: req.body.from_node
-            }, {
-                $set: {
-                    balance: balance - req.body.amount
-                }
-            }, function (err, tx) {
-                if (err) {
-                    response.resFalse(res, 'Error:', err.toLocaleString());
-                    return;
-                }
-
-                Key.findOneAndUpdate({
-                    address: req.body.from
-                }, {
-                    $set: {
-                        balance: balance - req.body.amount
-                    }
-                }, function (err, tx) {
-                    if (err) {
-                        response.resFalse(res, 'Error:', err.toLocaleString());
-                        return;
-                    }
-
-                    Key.findOneAndUpdate({
-                        address: req.body.to
-                    }, {
-                        $set: {
-                            balance: balance + req.body.amount
-                        }
-                    }, function (err, tx) {
-                        if (err) {
-                            response.resFalse(res, 'Error:', err.toLocaleString());
-                            return;
-                        }
-                    });
-                });
-
-            });
-        });
-
-        if (err) {
-            response.resFalse(res, 'Error:', err.toLocaleString());
         }
         else {
             response.resTrue(res, tx);
