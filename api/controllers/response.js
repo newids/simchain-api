@@ -6,6 +6,7 @@ module.exports.resFalse = function(res, msg, errors) {
         "errors": errors,
         "data": null,
     });
+    console.log('resFalse: ', errors);
 };
 
 module.exports.resTrue = function(res, data) {
@@ -16,6 +17,7 @@ module.exports.resTrue = function(res, data) {
         "errors": null,
         "data": (data),
     });
+    console.log('resTrue: ', data);
 };
 
 // var response = require('./response');

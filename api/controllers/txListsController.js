@@ -136,7 +136,6 @@ exports.create_a_tx_requests = function (req, res) {
     new_tx.save(function (err, tx) {
         if (err) {
             response.resFalse(res, 'Error:', err.toLocaleString());
-            return;
         }
         else {
             response.resTrue(res, tx);
