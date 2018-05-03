@@ -117,7 +117,7 @@ exports.get_address_balance = function (req, res) {
 
 exports.list_all_tx_requests = function (req, res) {
     txLists.find({
-        'height': 0
+        'height': -1
     }, function (err, tx) {
         if (err) {
             response.resFalse(res, 'Error:', err.toLocaleString());
