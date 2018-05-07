@@ -21,7 +21,11 @@ exports.read_a_tx_with_height = function (req, res) {
 
 exports.read_a_tx_with_node = function (req, res) {
     txLists.find({
-        'node_number': req.params.id
+        $or: [{
+            to_node: req.params.id
+        }, {
+            from_node: req.params.id
+        }]
     }, function (err, tx) {
         if (err) {
             response.resFalse(res, 'Error:', err.toLocaleString());
@@ -85,15 +89,17 @@ exports.get_address_balance = function (req, res) {
                         }
                         else {
                             if (tx2 === null || tx2 === undefined || tx2 === [] || tx2.length === 0 ||  tx2.total === 0) {
-                                console.log('tx2.total === 0 : ', tx);
-                                response.resTrue(res, tx);
+                                console.log('tx2.total === 0 : ', tx2);
+                                response.resTrue(res, tx2);
                             }
                             else {
-                                const grandtotal = tx.total - tx2.total;
                                 console.log('tx : ', tx);
                                 console.log('tx2 : ', tx2);
-                                console.log('grand total : ', grandtotal);
-                                response.resTrue(res, [{"total": grandtotal}]);
+                                const data = [ {
+                                    'address': req.params.id,
+                                    'balance': tx[0].total - tx2[0].total
+                                } ];
+                                response.resTrue(res, data);
                             }
                         }
                     });
@@ -131,7 +137,6 @@ exports.list_all_tx_requests = function (req, res) {
 exports.create_a_tx_requests = function (req, res) {
 
     var new_tx = new txLists(req.body);
-    new_tx.height = 0;
 
     new_tx.save(function (err, tx) {
         if (err) {

@@ -8,19 +8,12 @@ var txListSchema = new Schema({
     type: Number,
     required: true
   },
-  hash_pointer: {
-    type: String,
-    unique: true,
-    required: true
-  },
+  hash_pointer: String,
   from: String,
   from_node: String,
   to: String,
   to_node: String,
-  amount: {
-    type: Number,
-    default: 0
-  },
+  amount: Number,
   created_date: {
     type: Date,
     default: Date.now

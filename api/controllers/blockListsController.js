@@ -53,7 +53,7 @@ exports.createGenesisBlock = function (req, res) {
         to_node: "0000",
         amount: 10 ** 9
     });
-    new_tx.save(function (err, tx) {
+    new_tx.save(function (err, data) {
         if (err) {
             res.send(err);
             return;
@@ -74,14 +74,14 @@ exports.list_blocks = function (req, res) {
 
     var q = blockLists.find({}).sort({
         height: -1
-    }).limit(20);
+    }).limit(100);
 
     q.exec(function (err, block) {
         if (err) {
             response.resFalse(res, 'Error:', err.toLocaleString());
         }
         else {
-            response.resTrue(res, tx);
+            response.resTrue(res, block);
         }
     });
 
@@ -89,52 +89,53 @@ exports.list_blocks = function (req, res) {
 
 exports.create_a_block = function (req, res) {
     var new_block = new blockLists(req.body);
-    new_block.save(function (err, block) {
+
+    var tx_for_miner = {
+        height: new_block.height,
+        hash_pointer: req.body.merkle_root,
+        from: ' ',
+        from_node: ' ',
+        to: req.body.address,
+        to_node: req.body.node_number,
+        amount: 50
+    };
+
+    var new_tx = new txLists(tx_for_miner);
+
+    new_block.save(function (err, data) {
         if (err) {
             response.resFalse(res, 'Error:', err.toLocaleString());
             return;
         }
+        console.log('new_block.save:', data);
 
-        // txLists.find({
-        //   'height': 0
-        // }, function(err, tx) {
-        //   if (err)
-        //     res.send(err);
-        //
-        //   tx.height = new_block.height;
-        //   tx.update();
-        // });
-        var tx_for_miner = {
-            height: new_block.id,
-            hash_pointer: req.body.merkle_root,
-            from: "0",
-            from_node: "0",
-            to: req.body.address,
-            to_node: req.body.node_number,
-            amount: 100
-        };
+        new_tx.save(function (err, data) {
+            if (err) {
+                response.resFalse(res, 'Error:', err.toLocaleString());
+                return;
+            }
+            console.log('new_tx.save:', data);
 
-        var new_tx = new txLists(tx_for_miner);
+            txLists.updateMany({
+                    height: -1
+                }, {
+                    $set: {
+                        height: new_block.height,
+                        hash_pointer: new_block.merkle_root,
+                    }
+                },
+                function (err, data) {
+                    if (err) {
+                        response.resFalse(res, 'Error:', err.toLocaleString());
+                        return;
+                    }
+                    console.log('txLists.updateMany:', data);
 
-        new_tx.save(function (err, tx) {
-            if (err)
-                res.send(err);
+                    response.resTrue(res, new_block);
+                });
         });
-
-        txLists.updateMany({
-                height: 0
-            }, {
-                $set: {
-                    height: new_block.id
-                }
-            },
-            function (err, tx) {
-                if (err)
-                    res.send(err);
-            });
-
-        res.json(block);
     });
+
 };
 
 exports.read_a_block = function (req, res) {

@@ -6,6 +6,7 @@ var Schema = mongoose.Schema;
 var blockListSchema = new Schema({
   height: {
     type: Number,
+      unique: true,
     required: 'height'
   },
   node_number: {
