@@ -2,15 +2,10 @@ var passport = require('passport');
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
 
-var sendJSONresponse = function (res, status, content) {
-    res.status(status);
-    res.json(content);
-};
-
 module.exports.register = function (req, res) {
 
     if (!req.body.email || !req.body.password) {
-        sendJSONresponse(res, 400, {
+        res.status(400).json({
             "success": false,
             "message": "All fields required",
             "errors": "All fields required"
@@ -18,33 +13,51 @@ module.exports.register = function (req, res) {
         return;
     }
 
-    var user = new User();
+    try {
+        var user = new User();
 
-    user.node_number = ((Math.floor(Math.random() * 999) + 1) * 10 + Math.floor(Math.random() * 10)).toString();
-    user.email = req.body.email;
+        user.node_number = ((Math.floor(Math.random() * 99999) + 1) * 10 + Math.floor(Math.random() * 10)).toString(16);
+        user.email = req.body.email;
 
-    user.setPassword(req.body.password);
+        user.setPassword(req.body.password);
 
-    user.save(function (err) {
-        var token;
-        token = user.generateJwt();
-        res.status(200);
-        res.json({
-            "success": true,
-            "message": null,
-            "errors": null,
-            "token": token,
-            "node_number": user.node_number,
-            "email": user.email
+        user.save(function (err) {
+            if (err) {
+                res.status(401).json({
+                    "success": false,
+                    "message": "Error:",
+                    "errors": err.toLocaleString()
+                });
+                return;
+            }
+
+            var token;
+            token = user.generateJwt();
+            res.status(200);
+            res.json({
+                "success": true,
+                "message": null,
+                "errors": null,
+                "token": token,
+                "node_number": user.node_number,
+                "email": user.email
+            });
         });
-    });
+    } catch (e) {
+        res.status(401).json({
+            "success": false,
+            "message": "Error:",
+            "errors": e.toLocaleString()
+        });
+        return;
+    }
 
 };
 
 module.exports.login = function (req, res) {
 
     if (!req.body.email || !req.body.password) {
-        sendJSONresponse(res, 400, {
+        res.status(400).json({
             "success": false,
             "message": "All fields required",
             "errors": "All fields required"
@@ -76,30 +89,7 @@ module.exports.login = function (req, res) {
             });
         } else {
             // If user is not found
-            // res.status(401).json(info);
-            // --- register(req, res);
-            // ------------------------------------------------
-            var user = new User();
-
-            user.node_number = ((Math.floor(Math.random() * 999) + 1) * 10 + Math.floor(Math.random() * 10)).toString();
-            user.email = req.body.email;
-
-            user.setPassword(req.body.password);
-
-            user.save(function (err) {
-                var token;
-                token = user.generateJwt();
-                res.status(200);
-                res.json({
-                    "success": true,
-                    "message": null,
-                    "errors": null,
-                    "token": token,
-                    "node_number": user.node_number,
-                    "email": user.email
-                });
-            });
-            // ------------------------------------------------
+            res.status(401).json(info);
         }
     })(req, res);
 
