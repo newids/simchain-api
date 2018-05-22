@@ -2,6 +2,7 @@ var passport = require('passport');
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
 var response = require('./response');
+var crypto = require('crypto');
 
 module.exports.register = function (req, res) {
 
@@ -120,39 +121,41 @@ module.exports.reset = function (req, res) {
                     }
 
                     User.find({
-                            email: req.body.email
-                        }, function (err, user) {
+                        email: req.body.email
+                    }, function (err, user) {
+                        if (err) {
+                            response.resFalse(res, 'Error:', err.toLocaleString());
+                            return;
+                        }
+                        if (!user) {
+                            response.resFalse(res, 'Error:', 'Email Not Found!');
+                            return;
+                        }
+
+                        // user.setPassword(req.body.password);
+                        user.salt = crypto.randomBytes(16).toString('hex');
+                        user.hash = crypto.pbkdf2Sync(req.body.password, user.salt, 1000, 64, 'sha512').toString('hex');
+
+                        user.save(function (err) {
                             if (err) {
                                 response.resFalse(res, 'Error:', err.toLocaleString());
                                 return;
                             }
-                            if (!user) {
-                                response.resFalse(res, 'Error:', 'Email Not Found!');
-                                return;
-                            }
 
-                            user.setPassword(req.body.password);
+                            var token;
+                            token = user.generateJwt();
 
-                            user.save(function (err) {
-                                if (err) {
-                                    response.resFalse(res, 'Error:', err.toLocaleString());
-                                    return;
-                                }
-
-                                var token;
-                                token = user.generateJwt();
-
-                                res.status(200);
-                                res.json({
-                                    "success": true,
-                                    "message": null,
-                                    "errors": null,
-                                    "token": token,
-                                    "node_number": user.node_number,
-                                    "email": user.email
-                                });
+                            res.status(200);
+                            res.json({
+                                "success": true,
+                                "message": null,
+                                "errors": null,
+                                "token": token,
+                                "node_number": user.node_number,
+                                "email": user.email
                             });
                         });
+                    });
 
                 });
         } catch (e) {
