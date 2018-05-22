@@ -111,7 +111,7 @@ module.exports.reset = function (req, res) {
                         response.resFalse(res, 'Error:', err.toLocaleString());
                         return;
                     }
-                    if (user.node_number !== '8dde5') {
+                    if (user.node_number !== '0000') {
                         response.resFalse(res, 'Error:', 'UnauthorizedError: private profile');
                         return;
                     }
