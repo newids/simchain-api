@@ -1,6 +1,7 @@
 var passport = require('passport');
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
+var response = require('./response');
 
 module.exports.register = function (req, res) {
 
@@ -92,5 +93,67 @@ module.exports.login = function (req, res) {
             res.status(401).json(info);
         }
     })(req, res);
+
+};
+
+module.exports.reset = function (req, res) {
+
+    if (!req.payload._id) {
+        response.resFalse(res, 'Error:', 'UnauthorizedError: private profile');
+    } else {
+        try {
+            User
+                .findById(req.payload._id)
+                .exec(function (err, user) {
+                    if (err) {
+                        console.log('reset:', err.toLocaleString())
+                        response.resFalse(res, 'Error:', err.toLocaleString());
+                        return;
+                    }
+                    if (user.node_number !== '8dde5') {
+                        response.resFalse(res, 'Error:', 'UnauthorizedError: private profile');
+                        return;
+                    }
+                    if (!req.body.email || !req.body.password) {
+                        response.resFalse(res, 'Error:', 'All fields required');
+                        return;
+                    }
+
+                    User.find({
+                            email: req.req.body.email
+                        }, function (err, user) {
+                            if (err) {
+                                response.resFalse(res, 'Error:', err.toLocaleString());
+                                return;
+                            }
+
+                            user.setPassword(req.body.password);
+
+                            user.save(function (err) {
+                                if (err) {
+                                    response.resFalse(res, 'Error:', err.toLocaleString());
+                                    return;
+                                }
+
+                                var token;
+                                token = user.generateJwt();
+
+                                res.status(200);
+                                res.json({
+                                    "success": true,
+                                    "message": null,
+                                    "errors": null,
+                                    "token": token,
+                                    "node_number": user.node_number,
+                                    "email": user.email
+                                });
+                            });
+                        });
+
+                });
+        } catch (e) {
+            response.resFalse(res, 'Error:', e.toLocaleString());
+        }
+    }
 
 };
