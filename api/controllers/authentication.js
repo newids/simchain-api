@@ -132,18 +132,17 @@ module.exports.reset = function (req, res) {
                             return;
                         }
 
-                        // user.setPassword(req.body.password);
-                        user.salt = crypto.randomBytes(16).toString('hex');
-                        user.hash = crypto.pbkdf2Sync(req.body.password, user.salt, 1000, 64, 'sha512').toString('hex');
+                        let u = new User(user);
+                        u.setPassword(req.body.password);
 
-                        user.save(function (err) {
+                        u.save(function (err) {
                             if (err) {
                                 response.resFalse(res, 'Error:', err.toLocaleString());
                                 return;
                             }
 
                             var token;
-                            token = user.generateJwt();
+                            token = u.generateJwt();
 
                             res.status(200);
                             res.json({
@@ -151,8 +150,8 @@ module.exports.reset = function (req, res) {
                                 "message": null,
                                 "errors": null,
                                 "token": token,
-                                "node_number": user.node_number,
-                                "email": user.email
+                                "node_number": u.node_number,
+                                "email": u.email
                             });
                         });
                     });
