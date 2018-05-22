@@ -132,7 +132,7 @@ module.exports.reset = function (req, res) {
                             return;
                         }
 
-                        let u = new User(user);
+                        let u = new User(user[0]);
                         u.setPassword(req.body.password);
 
                         u.save(function (err) {
