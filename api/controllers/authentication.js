@@ -120,10 +120,14 @@ module.exports.reset = function (req, res) {
                     }
 
                     User.find({
-                            email: req.req.body.email
+                            email: req.body.email
                         }, function (err, user) {
                             if (err) {
                                 response.resFalse(res, 'Error:', err.toLocaleString());
+                                return;
+                            }
+                            if (!user) {
+                                response.resFalse(res, 'Error:', 'Email Not Found!');
                                 return;
                             }
 
