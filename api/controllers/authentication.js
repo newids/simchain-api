@@ -111,9 +111,9 @@ module.exports.reset = function (req, res) {
                         response.resFalse(res, 'Error:', err.toLocaleString());
                         return;
                     }
-                    if (user.node_number !== '0000') {
-                        response.resFalse(res, 'Error:', 'UnauthorizedError: private profile');
-                        return;
+                    // if (user.node_number !== '0000') {
+                    //     response.resFalse(res, 'Error:', 'UnauthorizedError: private profile');
+                    //     return;
                     }
                     if (!req.body.email || !req.body.password) {
                         response.resFalse(res, 'Error:', 'All fields required');
