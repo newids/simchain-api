@@ -114,7 +114,7 @@ module.exports.reset = function (req, res) {
                     // if (user.node_number !== '0000') {
                     //     response.resFalse(res, 'Error:', 'UnauthorizedError: private profile');
                     //     return;
-                    }
+                    // }
                     if (!req.body.email || !req.body.password) {
                         response.resFalse(res, 'Error:', 'All fields required');
                         return;
