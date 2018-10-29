@@ -99,26 +99,26 @@ module.exports.login = function (req, res) {
 
 module.exports.reset = function (req, res) {
 
-    // if (!req.payload._id) {
-    //     response.resFalse(res, 'Error:', 'UnauthorizedError: private profile');
-    // } else {
+    if (!req.payload._id) {
+        response.resFalse(res, 'Error:', 'UnauthorizedError: private profile');
+    } else {
         try {
-            // User
-            //     .findById(req.payload._id)
-            //     .exec(function (err, user) {
-            //         if (err) {
-            //             console.log('reset:', err.toLocaleString())
-            //             response.resFalse(res, 'Error:', err.toLocaleString());
-            //             return;
-            //         }
-            //         // if (user.node_number !== '0000') {
-            //         //     response.resFalse(res, 'Error:', 'UnauthorizedError: private profile');
-            //         //     return;
-            //         // }
-            //         if (!req.body.email || !req.body.password) {
-            //             response.resFalse(res, 'Error:', 'All fields required');
-            //             return;
-            //         }
+            User
+                .findById(req.payload._id)
+                .exec(function (err, user) {
+                    if (err) {
+                        console.log('reset:', err.toLocaleString())
+                        response.resFalse(res, 'Error:', err.toLocaleString());
+                        return;
+                    }
+                    if (user.node_number !== '0000') {
+                        response.resFalse(res, 'Error:', 'UnauthorizedError: private profile');
+                        return;
+                    }
+                    if (!req.body.email || !req.body.password) {
+                        response.resFalse(res, 'Error:', 'All fields required');
+                        return;
+                    }
 
                     User.find({
                         email: req.body.email
@@ -156,10 +156,10 @@ module.exports.reset = function (req, res) {
                         });
                     });
 
-                // });
+                });
         } catch (e) {
             response.resFalse(res, 'Error:', e.toLocaleString());
         }
-    // }
+    }
 
 };

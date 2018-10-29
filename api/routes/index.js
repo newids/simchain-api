@@ -23,6 +23,6 @@ router.post('/login', ctrlAuth.login);
 router.post('/logout', ctrlAuth.login);
 
 // password reset
-router.post('/reset', ctrlAuth.reset);
+router.post('/reset', auth, ctrlAuth.reset);
 
 module.exports = router;
